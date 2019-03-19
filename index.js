@@ -67,6 +67,40 @@ server.delete('/api/users/:id', (req, res) => {
     });
 });
 
+//PUT - /api/users/:id -Updates the user with the specified id using data from the request body. 
+//Returns the modified document, NOT the original.
+
+server.put('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+    const userInfo = req.body;
+
+    if (userInfo.id && userInfo.data) {
+        db.update( id, userInfo)
+        .then(update => {
+            if(update) {
+                db.findById(id)
+                .then(user => {
+                res.status(200).json({ user });
+            })
+                .catch();
+            } else {
+                res.status(404).json({
+                    message: "The user with the specified ID does not exist."
+                  });
+            }
+        }) 
+        .catch(error => {
+            res
+              .status(500)
+              .json({ error: "The user information could not be modified." });
+          }); 
+    } else {
+        res
+      .status(400)
+      .json({ error: "Please provide name and bio for the user." });
+    }
+});
+
 
 
 
